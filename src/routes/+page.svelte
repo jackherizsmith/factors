@@ -1,20 +1,21 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { fade, slide, fly } from 'svelte/transition';
+
 	type Result = { factor: number; isCorrect: boolean };
-	type Guess = { guess: number; results: Result[] };
+	type Guess = { guess: number; results: Result[]; correctProduct: number };
 
 	let secretNumber: number;
 	let primeFactors: number[] = [];
 	let userGuess = '';
 	let results: Result[] = [];
-	let allGuesses: Guess[] = []; // Track all user guesses
+	let allGuesses: Guess[] = [];
+	let isSuccess = false;
+	let errorMessage = '';
 
-	// Function to generate a random 3-digit number
 	function generateSecretNumber() {
-		// Primes ≤ 29
 		const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29];
 
-		// Function to check if a number's factors are all ≤ 29
 		function hasValidPrimeFactors(num: number) {
 			for (let prime of primes) {
 				while (num % prime === 0) {
@@ -24,7 +25,6 @@
 			return num === 1;
 		}
 
-		// Precompute all valid 3-digit numbers
 		const validNumbers: number[] = [];
 		for (let i = 100; i <= 999; i++) {
 			if (hasValidPrimeFactors(i)) {
@@ -32,7 +32,6 @@
 			}
 		}
 
-		// Use today's date to seed randomness
 		const today = new Date();
 		const seed = today.getFullYear() * 1000 + (today.getMonth() + 1) * 100 + today.getDate();
 
@@ -41,12 +40,10 @@
 			return x - Math.floor(x);
 		}
 
-		// Select a random number from the valid list
 		const randomIndex = Math.floor(seededRandom(seed) * validNumbers.length);
 		return validNumbers[randomIndex];
 	}
 
-	// Function to calculate prime factors of a number
 	function getPrimeFactors(num: number) {
 		const factors = [];
 		let divisor = 2;
@@ -61,27 +58,27 @@
 		return factors;
 	}
 
-	// Initialize the game
 	onMount(() => {
 		secretNumber = generateSecretNumber();
 		primeFactors = getPrimeFactors(secretNumber);
-		console.log(`Secret number: ${secretNumber}, Prime factors: ${primeFactors}`);
 	});
 
-	// Handle the user's guess
 	function handleGuess() {
+		errorMessage = '';
 		const parsedGuess = parseInt(userGuess);
-		if (isNaN(parsedGuess)) return;
+
+		if (isNaN(parsedGuess) || parsedGuess < 100 || parsedGuess > 999) {
+			errorMessage = 'Please enter a valid 3-digit number!';
+			return;
+		}
 
 		const guessFactors = getPrimeFactors(parsedGuess);
 
-		// Check if the guessed factors match the secret factors exactly
 		const isExactMatch =
 			guessFactors.length === primeFactors.length &&
 			guessFactors.every((factor) => primeFactors.includes(factor)) &&
 			guessFactors.reduce((product, factor) => product * factor, 1) === secretNumber;
 
-		// Generate results for display
 		const factorCounts: Record<number, number> = {};
 		for (const factor of primeFactors) {
 			factorCounts[factor] = (factorCounts[factor] || 0) + 1;
@@ -95,85 +92,256 @@
 			return { factor, isCorrect: false };
 		});
 
+		const correctProduct = roundResults
+			.filter((res) => res.isCorrect)
+			.reduce((prod, res) => prod * res.factor, 1);
+
 		results = roundResults;
+		allGuesses = [{ guess: parsedGuess, results: roundResults, correctProduct }, ...allGuesses];
 
-		// Track the guess
-		allGuesses = [...allGuesses, { guess: parsedGuess, results: roundResults }];
-
-		// Check for success
 		if (isExactMatch) {
-			alert(`Congratulations! You guessed the exact prime factors of ${secretNumber}!`);
-			resetGame();
+			isSuccess = true;
 		}
 
 		userGuess = '';
 	}
 
-	// Reset the game
-	function resetGame() {
-		//complete game
+	async function copyResultsToClipboard() {
+		const today = new Date();
+		const todayDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+		const allGuessesFlat = allGuesses.flatMap((g) => g.results);
+		const incorrectGuesses = allGuessesFlat.filter((g) => !g.isCorrect);
+		const incorrectPct = incorrectGuesses.length / allGuessesFlat.length;
+		const sumOfBadGuesses = incorrectGuesses.reduce((a, b) => a + b.factor, 0);
+		const score = secretNumber / (sumOfBadGuesses + allGuesses.length - 1);
+		const resultText = [
+			todayDate,
+			`🔁: ${allGuesses.length}`,
+			`🔴: ${(incorrectPct * 100).toFixed(1)}%`,
+			`👌: ${isNaN(score) ? 0 : (1 / score).toFixed(4)}`
+		].join('\n');
+
+		try {
+			await navigator.clipboard.writeText(resultText);
+			alert('Results copied to clipboard!');
+		} catch (err) {
+			alert('Failed to copy results.');
+		}
 	}
 </script>
 
 <main>
-	<h1>Prime Factor Guessing Game</h1>
-	<p>Guess the 3-digit number's prime factors.</p>
+	<div class="header">
+		<h1>Prime Factor Challenge</h1>
+		<p>Daily Challenge for {new Date().toLocaleDateString()}</p>
+	</div>
 
-	<form on:submit|preventDefault={handleGuess}>
-		<input type="number" bind:value={userGuess} placeholder="Enter your guess" required />
-		<button type="submit">Submit Guess</button>
-	</form>
-
-	<h2>Results</h2>
-	{#if results.length > 0}
-		<div>
-			{#each results as { factor, isCorrect }}
-				<span class="result {isCorrect ? 'correct' : 'incorrect'}">
-					{factor}
-				</span>
-			{/each}
+	{#if isSuccess}
+		<div class="success" transition:fade>
+			<h2>🎉 You did it! 🎉</h2>
+			<p>Secret Number: {secretNumber}</p>
+			<button on:click={copyResultsToClipboard} class="copy-btn">Copy Results</button>
 		</div>
+	{:else}
+		<form on:submit|preventDefault={handleGuess} transition:fly={{ x: 100 }}>
+			<input
+				type="number"
+				bind:value={userGuess}
+				placeholder="Enter your guess (3-digit)"
+				required
+				class="guess-input"
+			/>
+			<button type="submit" class="guess-btn">Submit Guess</button>
+		</form>
 	{/if}
 
-	<h2>All Guesses</h2>
-	{#each allGuesses as { guess, results }, index}
-		<div class="guess">
-			<div class="guess-number">Guess {index + 1}: {guess}</div>
-			<div>
-				{#each results as { factor, isCorrect }}
-					<span class="result {isCorrect ? 'correct' : 'incorrect'}">
-						{factor}
-					</span>
-				{/each}
+	{#if errorMessage}
+		<p class="error-message" transition:fade>{errorMessage}</p>
+	{/if}
+
+	<h2 hidden>Your Guesses</h2>
+	<div class="guesses">
+		{#each allGuesses as { guess, results, correctProduct }, index}
+			<div class="guess-card" transition:slide>
+				<p class="guess-header">
+					{guess}
+				</p>
+				<div class="guess-results">
+					{#each results as { factor, isCorrect }}
+						<span class="result {isCorrect ? 'correct' : 'incorrect'}">
+							{factor}
+						</span>
+					{/each}
+				</div>
+				{#if results.some((r) => r.isCorrect)}
+					<div class="result correct">{correctProduct}</div>
+				{/if}
 			</div>
-		</div>
-	{/each}
+		{/each}
+	</div>
 </main>
 
 <style>
-	.result {
-		display: inline-block;
-		margin: 0.2rem;
-		padding: 0.5rem;
-		border-radius: 5px;
+	/* General Styles */
+	:root {
+		--bg-color: #f9f9f9;
+		--primary-color: #007bff;
+		--success-color: #28a745;
+		--danger-color: #dc3545;
+		--font-color: #333;
+		--padding: 1rem;
+		color: var(--font-color);
+		background-color: var(--bg-color);
+	}
+	main {
+		font-family: sans-serif;
+		padding: var(--padding);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin: 0;
 	}
 
-	.correct {
-		background-color: #d4edda;
-		color: #155724;
+	.header h1 {
+		margin: 0.5rem 0;
+		font-size: 1.5rem;
+		text-align: center;
 	}
 
-	.incorrect {
-		background-color: #f8d7da;
-		color: #721c24;
+	.header p {
+		font-size: 1rem;
+		color: #555;
 	}
 
-	.guess {
+	form {
+		width: 100%;
+		max-width: 400px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.guess-input {
+		padding: 0.8rem;
+		margin-bottom: 0.5rem;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		font-size: 1rem;
+	}
+
+	.guess-btn {
+		padding: 0.8rem;
+		background-color: var(--primary-color);
+		color: #fff;
+		border: none;
+		border-radius: 4px;
+		font-size: 1rem;
+		cursor: pointer;
+		transition: background-color 0.3s;
+	}
+
+	.guess-btn:hover {
+		background-color: #0056b3;
+	}
+
+	.error-message {
+		color: var(--danger-color);
+		margin-top: 0.5rem;
+		font-size: 0.9rem;
+	}
+
+	.success {
+		text-align: center;
+		background-color: var(--success-color);
+		color: #fff;
+		padding: 1rem;
+		border-radius: 8px;
+	}
+
+	.success h2 {
+		margin-bottom: 0.5rem;
+	}
+
+	.copy-btn {
+		padding: 0.8rem;
+		background-color: var(--primary-color);
+		color: #fff;
+		border: none;
+		border-radius: 4px;
+		font-size: 1rem;
+		cursor: pointer;
 		margin-top: 1rem;
 	}
 
-	.guess-number {
-		font-weight: bold;
-		margin-bottom: 0.5rem;
+	.copy-btn:hover {
+		background-color: #0056b3;
+	}
+
+	.guesses {
+		width: 100%;
+		max-width: 400px;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		margin-top: 1rem;
+	}
+
+	.guess-card {
+		align-items: center;
+		background-color: #fff;
+		border: 1px solid #ccc;
+		border-radius: 8px;
+		display: flex;
+		gap: 1rem;
+		justify-content: space-between;
+		padding: 0.8rem;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
+
+	.guess-header {
+		display: flex;
+		justify-content: space-between;
+		font-size: 0.9rem;
+		margin: 0;
+	}
+
+	.guess-results {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		flex: 1;
+	}
+
+	.result {
+		display: inline-block;
+		padding: 0.5rem;
+		border-radius: 4px;
+		font-size: 0.9rem;
+		text-align: center;
+	}
+
+	.correct {
+		background-color: var(--success-color);
+		color: #fff;
+	}
+
+	.incorrect {
+		background-color: var(--danger-color);
+		color: #fff;
+	}
+
+	/* Responsive Design */
+	@media (min-width: 768px) {
+		main {
+			padding: 2rem;
+		}
+
+		.header h1 {
+			font-size: 2rem;
+		}
+
+		.guess-input,
+		.guess-btn {
+			font-size: 1.2rem;
+		}
 	}
 </style>
