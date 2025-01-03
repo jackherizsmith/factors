@@ -71,19 +71,25 @@
 	// Handle the user's guess
 	function handleGuess() {
 		const parsedGuess = parseInt(userGuess);
-		if (isNaN(parsedGuess)) return; // Ensure the guess is valid
+		if (isNaN(parsedGuess)) return;
 
 		const guessFactors = getPrimeFactors(parsedGuess);
-		const factorCounts: Record<number, number> = {};
 
-		// Count occurrences of each factor in the secret number
+		// Check if the guessed factors match the secret factors exactly
+		const isExactMatch =
+			guessFactors.length === primeFactors.length &&
+			guessFactors.every((factor) => primeFactors.includes(factor)) &&
+			guessFactors.reduce((product, factor) => product * factor, 1) === secretNumber;
+
+		// Generate results for display
+		const factorCounts: Record<number, number> = {};
 		for (const factor of primeFactors) {
 			factorCounts[factor] = (factorCounts[factor] || 0) + 1;
 		}
 
 		const roundResults = guessFactors.map((factor) => {
 			if (factorCounts[factor]) {
-				factorCounts[factor]--; // Decrease count for matched factor
+				factorCounts[factor]--;
 				return { factor, isCorrect: true };
 			}
 			return { factor, isCorrect: false };
@@ -91,20 +97,12 @@
 
 		results = roundResults;
 
-		// Track the user's guess and results
+		// Track the guess
 		allGuesses = [...allGuesses, { guess: parsedGuess, results: roundResults }];
 
-		// Check if all factors are guessed correctly
-		if (
-			Object.values(factorCounts).every((count) => count === 0) &&
-			primeFactors.every((f) =>
-				results
-					.filter((r) => r.isCorrect)
-					.map((r) => r.factor)
-					.includes(f)
-			)
-		) {
-			alert(`Congratulations! You guessed all prime factors of ${secretNumber}!`);
+		// Check for success
+		if (isExactMatch) {
+			alert(`Congratulations! You guessed the exact prime factors of ${secretNumber}!`);
 			resetGame();
 		}
 
