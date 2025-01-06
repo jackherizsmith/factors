@@ -138,7 +138,7 @@
 
 <main>
 	<div class="header">
-		<h1>X Factors</h1>
+		<h1>Prime Factory</h1>
 		<button class="info-btn" on:click={toggleModal}>Info</button>
 		<p>{new Date().toLocaleDateString()}</p>
 	</div>
@@ -147,9 +147,12 @@
 		<h2>Rules</h2>
 		<p>Guess the three digit number, using the correct, prime factors of your previous guesses.</p>
 		<ul>
-			<li>Factors will be marked as correct or incorrect.</li>
-			<li>The goal is to match all the prime factors of the secret number.</li>
-			<li>Keep going - your guess could be a factor of the correct number.</li>
+			<li>Match all the prime factors of today's number.</li>
+			<li>
+				Factors will be marked as <b class="correct-text">correct</b> or
+				<b class="incorrect-text">incorrect</b>.
+			</li>
+			<li>Keep going until you strike <b class="win-text">gold</b>.</li>
 		</ul>
 		<button on:click={toggleModal}>Close</button>
 	</dialog>
@@ -199,11 +202,15 @@
 						</span>
 					{/each}
 				</div>
-				{#if results.some((r) => r.isCorrect)}
-					<div class={`result ${isSuccess && index === 0 ? 'win' : 'correct'}`}>
-						{correctProduct}
-					</div>
-				{/if}
+				<div
+					class="result {isSuccess && index === 0
+						? 'win'
+						: results.some((r) => r.isCorrect)
+							? 'correct'
+							: 'incorrect'}"
+				>
+					{correctProduct}
+				</div>
 			</div>
 		{/each}
 	</div>
@@ -213,6 +220,7 @@
 	:root {
 		--bg-color: #f9f9f9;
 		--primary-color: #007bff;
+		--win-text: #d4af37;
 		--win-color: #fdde6c;
 		--success-color: #28a745;
 		--danger-color: #dc3545;
@@ -284,8 +292,12 @@
 		z-index: 10;
 	}
 
-	dialog::backdrop {
-		background: black;
+	dialog ul {
+		text-align: left;
+	}
+
+	dialog li {
+		margin-bottom: 0.25rem;
 	}
 
 	dialog h2 {
@@ -371,6 +383,18 @@
 		border-radius: 4px;
 		font-size: 0.9rem;
 		text-align: center;
+	}
+
+	.win-text {
+		color: var(--win-text);
+	}
+
+	.correct-text {
+		color: var(--success-color);
+	}
+
+	.incorrect-text {
+		color: var(--danger-color);
 	}
 
 	.win {
