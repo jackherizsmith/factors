@@ -149,7 +149,7 @@
 			Guess today's three digit number, using the correct prime factors of your previous guesses.
 		</p>
 		<ul>
-			<li>The biggest possible prime factor in this game is 29.</li>
+			<li>The prime factors in this game go up to 29.</li>
 			<li>
 				Factors will be marked as <b class="correct-text">correct</b> or
 				<b class="incorrect-text">incorrect</b>.
