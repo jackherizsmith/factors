@@ -2,6 +2,12 @@
 	import { onMount } from 'svelte';
 	import { fade, slide, fly } from 'svelte/transition';
 
+	let showModal = false;
+
+	function toggleModal() {
+		showModal = !showModal;
+	}
+
 	type Result = { factor: number; isCorrect: boolean };
 	type Guess = { guess: number; results: Result[]; correctProduct: number };
 
@@ -11,6 +17,7 @@
 	let results: Result[] = [];
 	let allGuesses: Guess[] = [];
 	let isSuccess = false;
+	let isCopied = false;
 	let errorMessage = '';
 
 	function generateSecretNumber() {
@@ -124,26 +131,36 @@
 			'jackherizsmith.github.io/factors'
 		].join('\n');
 
-		try {
-			await navigator.clipboard.writeText(resultText);
-			alert('Results copied to clipboard!');
-		} catch (err) {
-			alert('Failed to copy results.');
-		}
+		await navigator.clipboard.writeText(resultText);
+		isCopied = true;
 	}
 </script>
 
 <main>
 	<div class="header">
 		<h1>Factors</h1>
+		<button class="info-btn" on:click={toggleModal}>Info</button>
 		<p>{new Date().toLocaleDateString()}</p>
 	</div>
+
+	<dialog open={showModal}>
+		<h2>Rules</h2>
+		<p>Guess the three digit number, using the correct, prime factors of your previous guesses.</p>
+		<ul>
+			<li>Factors will be marked as correct or incorrect.</li>
+			<li>The goal is to match all the prime factors of the secret number.</li>
+			<li>Keep going - your guess could be a factor of the correct number.</li>
+		</ul>
+		<button on:click={toggleModal}>Close</button>
+	</dialog>
 
 	{#if isSuccess}
 		<div class="success" transition:fade>
 			<h2>🎉 You did it! 🎉</h2>
-			<p>Secret Number: {secretNumber}</p>
-			<button on:click={copyResultsToClipboard} class="copy-btn">Copy Results</button>
+			<p>Today's solution: {secretNumber}</p>
+			<button on:click={copyResultsToClipboard} class="copy-btn"
+				>{isCopied ? 'Copied!' : 'Share'}</button
+			>
 		</div>
 	{:else}
 		<form on:submit|preventDefault={handleGuess} transition:fly={{ x: 100 }}>
@@ -154,7 +171,7 @@
 				required
 				class="guess-input"
 			/>
-			<button type="submit" class="guess-btn">Submit Guess</button>
+			<button type="submit">Submit guess</button>
 		</form>
 	{/if}
 
@@ -185,7 +202,6 @@
 </main>
 
 <style>
-	/* General Styles */
 	:root {
 		--bg-color: #f9f9f9;
 		--primary-color: #007bff;
@@ -207,8 +223,23 @@
 	}
 
 	h1,
+	h2,
 	p {
 		margin: 0;
+	}
+
+	button {
+		padding: 0.5rem 1rem;
+		background-color: var(--primary-color);
+		color: white;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		transition: background-color 0.3s;
+	}
+
+	button:hover {
+		filter: saturate(0.7);
 	}
 
 	.header {
@@ -217,12 +248,42 @@
 	}
 
 	.header h1 {
-		font-size: 1.5rem;
+		font-size: 1.25rem;
 	}
 
 	.header p {
 		font-size: 1rem;
 		color: #555;
+	}
+
+	.info-btn {
+		top: 0.5rem;
+		right: 0.5rem;
+		position: fixed;
+	}
+
+	dialog {
+		background: white;
+		padding: 1rem;
+		border-radius: 8px;
+		margin-top: -0.75rem;
+		max-width: 400px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+		text-align: center;
+		position: absolute;
+		z-index: 10;
+	}
+
+	dialog::backdrop {
+		background: black;
+	}
+
+	dialog h2 {
+		margin-bottom: 0.5rem;
+	}
+
+	dialog button {
+		background-color: var(--danger-color);
 	}
 
 	form {
@@ -238,21 +299,6 @@
 		border: 1px solid #ccc;
 		border-radius: 4px;
 		font-size: 1rem;
-	}
-
-	.guess-btn {
-		padding: 0.8rem;
-		background-color: var(--primary-color);
-		color: #fff;
-		border: none;
-		border-radius: 4px;
-		font-size: 1rem;
-		cursor: pointer;
-		transition: background-color 0.3s;
-	}
-
-	.guess-btn:hover {
-		background-color: #0056b3;
 	}
 
 	.error-message {
@@ -274,18 +320,7 @@
 	}
 
 	.copy-btn {
-		padding: 0.8rem;
-		background-color: var(--primary-color);
-		color: #fff;
-		border: none;
-		border-radius: 4px;
-		font-size: 1rem;
-		cursor: pointer;
 		margin-top: 1rem;
-	}
-
-	.copy-btn:hover {
-		background-color: #0056b3;
 	}
 
 	.guesses {
@@ -329,31 +364,24 @@
 		border-radius: 4px;
 		font-size: 0.9rem;
 		text-align: center;
+		color: #fff;
 	}
 
 	.correct {
 		background-color: var(--success-color);
-		color: #fff;
 	}
 
 	.incorrect {
 		background-color: var(--danger-color);
-		color: #fff;
 	}
 
-	/* Responsive Design */
 	@media (min-width: 768px) {
 		main {
 			padding: 2rem;
 		}
 
 		.header h1 {
-			font-size: 2rem;
-		}
-
-		.guess-input,
-		.guess-btn {
-			font-size: 1.2rem;
+			font-size: 1.25rem;
 		}
 	}
 </style>
