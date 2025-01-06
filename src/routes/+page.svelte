@@ -139,7 +139,7 @@
 <main>
 	<div class="header">
 		<h1>Prime Factory</h1>
-		<button class="info-btn" on:click={toggleModal}>Info</button>
+		<button class="info-btn" on:click={toggleModal}>How to play</button>
 		<p>{new Date().toLocaleDateString()}</p>
 	</div>
 
