@@ -149,12 +149,12 @@
 			Guess today's three digit number, using the correct prime factors of your previous guesses.
 		</p>
 		<ul>
-			<li>The prime factors in this game go up to 29.</li>
+			<li>The biggest prime factor in this game is 29 🧮</li>
 			<li>
 				Factors will be marked as <b class="correct-text">correct</b> or
-				<b class="incorrect-text">incorrect</b>.
+				<b class="incorrect-text">incorrect</b>
 			</li>
-			<li>Keep going until you strike <b class="win-text">gold</b>.</li>
+			<li>Keep going until you strike <b class="win-text">gold</b></li>
 			<li>The lower your score, the better you did 🏆</li>
 		</ul>
 		<button on:click={toggleModal}>Close</button>
