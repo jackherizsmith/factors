@@ -127,7 +127,7 @@
 			todayDate,
 			`🔁: ${allGuesses.length}`,
 			`🔴: ${(incorrectPct * 100).toFixed(1)}%`,
-			`👌: ${isNaN(score) ? 0 : score}`,
+			`👌: ${score}`,
 			'jackherizsmith.github.io/factors'
 		].join('\n');
 
@@ -138,7 +138,7 @@
 
 <main>
 	<div class="header">
-		<h1>Factors</h1>
+		<h1>X Factors</h1>
 		<button class="info-btn" on:click={toggleModal}>Info</button>
 		<p>{new Date().toLocaleDateString()}</p>
 	</div>
@@ -155,7 +155,7 @@
 	</dialog>
 
 	{#if isSuccess}
-		<div class="success" transition:fade>
+		<div class="success correct" transition:fade>
 			<h2>🎉 You did it! 🎉</h2>
 			<p>Today's solution: {secretNumber}</p>
 			<button on:click={copyResultsToClipboard} class="copy-btn"
@@ -163,7 +163,7 @@
 			>
 		</div>
 	{:else}
-		<form on:submit|preventDefault={handleGuess} transition:fly={{ x: 100 }}>
+		<form on:submit|preventDefault={handleGuess}>
 			<input
 				type="number"
 				bind:value={userGuess}
@@ -188,13 +188,21 @@
 				</p>
 				<div class="guess-results">
 					{#each results as { factor, isCorrect }}
-						<span class="result {isCorrect ? 'correct' : 'incorrect'}">
+						<span
+							class="result {isSuccess && index === 0
+								? 'win'
+								: isCorrect
+									? 'correct'
+									: 'incorrect'}"
+						>
 							{factor}
 						</span>
 					{/each}
 				</div>
 				{#if results.some((r) => r.isCorrect)}
-					<div class="result correct">{correctProduct}</div>
+					<div class={`result ${isSuccess && index === 0 ? 'win' : 'correct'}`}>
+						{correctProduct}
+					</div>
 				{/if}
 			</div>
 		{/each}
@@ -205,6 +213,7 @@
 	:root {
 		--bg-color: #f9f9f9;
 		--primary-color: #007bff;
+		--win-color: #fdde6c;
 		--success-color: #28a745;
 		--danger-color: #dc3545;
 		--font-color: #333;
@@ -235,11 +244,11 @@
 		border: none;
 		border-radius: 4px;
 		cursor: pointer;
-		transition: background-color 0.3s;
+		transition: filter 0.3s;
 	}
 
 	button:hover {
-		filter: saturate(0.7);
+		filter: brightness(0.9);
 	}
 
 	.header {
@@ -248,7 +257,8 @@
 	}
 
 	.header h1 {
-		font-size: 1.25rem;
+		font-size: 1.5rem;
+		margin-bottom: 0.25rem;
 	}
 
 	.header p {
@@ -282,10 +292,6 @@
 		margin-bottom: 0.5rem;
 	}
 
-	dialog button {
-		background-color: var(--danger-color);
-	}
-
 	form {
 		width: 100%;
 		max-width: 400px;
@@ -309,17 +315,18 @@
 
 	.success {
 		text-align: center;
-		background-color: var(--success-color);
-		color: #fff;
 		padding: 1rem;
 		border-radius: 8px;
 	}
 
 	.success h2 {
+		font-size: 1.25rem;
 		margin-bottom: 0.5rem;
 	}
 
 	.copy-btn {
+		background-color: white;
+		color: var(--font-color);
 		margin-top: 1rem;
 	}
 
@@ -364,15 +371,20 @@
 		border-radius: 4px;
 		font-size: 0.9rem;
 		text-align: center;
-		color: #fff;
+	}
+
+	.win {
+		background-color: var(--win-color);
 	}
 
 	.correct {
 		background-color: var(--success-color);
+		color: #fff;
 	}
 
 	.incorrect {
 		background-color: var(--danger-color);
+		color: #fff;
 	}
 
 	@media (min-width: 768px) {
