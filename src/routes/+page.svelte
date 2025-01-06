@@ -146,7 +146,7 @@
 	<dialog open={showModal}>
 		<h2>Rules</h2>
 		<p>
-			Guess today's three digit number, using the correct, prime factors of your previous guesses.
+			Guess today's three digit number, using the correct prime factors of your previous guesses.
 		</p>
 		<ul>
 			<li>
