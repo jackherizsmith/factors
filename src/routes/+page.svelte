@@ -137,10 +137,12 @@
 </script>
 
 <main>
-	<div class="header">
-		<h1>Prime Factory</h1>
-		<button class="info-btn" on:click={toggleModal}>How to play</button>
-		<p>{new Date().toLocaleDateString()}</p>
+	<div class="header-wrapper">
+		<div class="header">
+			<h1>Prime Factory</h1>
+			<p>{new Date().toLocaleDateString()}</p>
+		</div>
+		<button class="info-btn" on:click={toggleModal}>How?</button>
 	</div>
 
 	<dialog open={showModal}>
@@ -149,13 +151,13 @@
 			Guess today's three digit number, using the correct prime factors of your previous guesses.
 		</p>
 		<ul>
-			<li>The biggest prime factor in this game is 29 🧮</li>
+			<li>The biggest prime factor is <b>29</b></li>
 			<li>
-				Factors will be marked as <b class="correct-text">correct</b> or
+				Factors will be <b class="correct-text">correct</b> or
 				<b class="incorrect-text">incorrect</b>
 			</li>
 			<li>Keep going until you strike <b class="win-text">gold</b></li>
-			<li>The lower your score, the better you did 🏆</li>
+			<li>A lower score is better 🏆</li>
 		</ul>
 		<button on:click={toggleModal}>Close</button>
 	</dialog>
@@ -177,7 +179,7 @@
 				required
 				class="guess-input"
 			/>
-			<button type="submit">Submit guess</button>
+			<button type="submit">Guess</button>
 		</form>
 	{/if}
 
@@ -256,6 +258,7 @@
 		border-radius: 4px;
 		cursor: pointer;
 		transition: filter 0.3s;
+		font-size: 1rem;
 	}
 
 	button:hover {
@@ -264,7 +267,14 @@
 
 	.header {
 		margin-bottom: 0.5rem;
-		text-align: center;
+	}
+
+	.header-wrapper {
+		display: flex;
+		align-items: start;
+		justify-content: space-between;
+		width: 100%;
+		max-width: 400px;
 	}
 
 	.header h1 {
@@ -277,17 +287,11 @@
 		color: #555;
 	}
 
-	.info-btn {
-		top: 0.5rem;
-		right: 0.5rem;
-		position: fixed;
-	}
-
 	dialog {
 		background: white;
-		padding: 1rem;
+		padding: 1rem 0.5rem;
 		border-radius: 8px;
-		margin-top: -0.75rem;
+		margin: 0 1.5rem;
 		max-width: 400px;
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 		text-align: center;
@@ -297,6 +301,7 @@
 
 	dialog ul {
 		text-align: left;
+		padding-left: 1.25rem;
 	}
 
 	dialog li {
@@ -414,13 +419,32 @@
 		color: #fff;
 	}
 
-	@media (min-width: 768px) {
+	@media (min-width: 460px) {
 		main {
 			padding: 2rem;
 		}
 
+		.header-wrapper {
+			display: initial;
+			text-align: center;
+		}
+
 		.header h1 {
 			font-size: 1.25rem;
+		}
+
+		.info-btn {
+			top: 0.5rem;
+			right: 0.5rem;
+			position: fixed;
+		}
+
+		dialog {
+			margin: 0 auto;
+		}
+
+		dialog ul {
+			padding-left: 5rem;
 		}
 	}
 </style>
