@@ -118,7 +118,8 @@
 			todayDate,
 			`🔁: ${allGuesses.length}`,
 			`🔴: ${(incorrectPct * 100).toFixed(1)}%`,
-			`👌: ${isNaN(score) ? 0 : (1 / score).toFixed(4)}`
+			`👌: ${isNaN(score) ? 0 : (1 / score).toFixed(4)}`,
+			'jackherizsmith.github.io/factors'
 		].join('\n');
 
 		try {
