@@ -69,6 +69,7 @@
 
 		if (isNaN(parsedGuess) || parsedGuess < 100 || parsedGuess > 999) {
 			errorMessage = 'Please enter a valid 3-digit number!';
+			document.querySelector<HTMLInputElement>('.guess-input')?.focus();
 			return;
 		}
 
@@ -101,6 +102,8 @@
 
 		if (isExactMatch) {
 			isSuccess = true;
+		} else {
+			document.querySelector<HTMLInputElement>('.guess-input')?.focus();
 		}
 
 		userGuess = '';
@@ -112,13 +115,12 @@
 		const allGuessesFlat = allGuesses.flatMap((g) => g.results);
 		const incorrectGuesses = allGuessesFlat.filter((g) => !g.isCorrect);
 		const incorrectPct = incorrectGuesses.length / allGuessesFlat.length;
-		const sumOfBadGuesses = incorrectGuesses.reduce((a, b) => a + b.factor, 0);
-		const score = secretNumber / (sumOfBadGuesses + allGuesses.length - 1);
+		const score = allGuesses.length + incorrectGuesses.length - 1;
 		const resultText = [
 			todayDate,
 			`🔁: ${allGuesses.length}`,
 			`🔴: ${(incorrectPct * 100).toFixed(1)}%`,
-			`👌: ${isNaN(score) ? 0 : (1 / score).toFixed(4)}`,
+			`👌: ${isNaN(score) ? 0 : score}`,
 			'jackherizsmith.github.io/factors'
 		].join('\n');
 
@@ -133,8 +135,8 @@
 
 <main>
 	<div class="header">
-		<h1>Prime Factor Challenge</h1>
-		<p>Daily Challenge for {new Date().toLocaleDateString()}</p>
+		<h1>Factors</h1>
+		<p>{new Date().toLocaleDateString()}</p>
 	</div>
 
 	{#if isSuccess}
@@ -201,12 +203,21 @@
 		flex-direction: column;
 		align-items: center;
 		margin: 0;
+		overflow-x: hidden;
+	}
+
+	h1,
+	p {
+		margin: 0;
+	}
+
+	.header {
+		margin-bottom: 0.5rem;
+		text-align: center;
 	}
 
 	.header h1 {
-		margin: 0.5rem 0;
 		font-size: 1.5rem;
-		text-align: center;
 	}
 
 	.header p {
