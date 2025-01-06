@@ -153,6 +153,7 @@
 				<b class="incorrect-text">incorrect</b>.
 			</li>
 			<li>Keep going until you strike <b class="win-text">gold</b>.</li>
+			<li>The lower your score, the better you did.</li>
 		</ul>
 		<button on:click={toggleModal}>Close</button>
 	</dialog>
