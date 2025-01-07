@@ -163,27 +163,22 @@
 		<button on:click={toggleModal}>Close</button>
 	</dialog>
 
-	{#if isSuccess}
-		<div class="success correct" transition:fade>
-			<h2>🎉 You did it! 🎉</h2>
-			<p>Today's solution: {secretNumber}</p>
-			<button on:click={copyResultsToClipboard} class="copy-btn"
-				>{isCopied ? 'Copied!' : 'Share'}</button
-			>
-		</div>
-	{:else}
-		<form on:submit|preventDefault={handleGuess}>
-			<input
-				type="number"
-				bind:value={userGuess}
-				placeholder="Enter your guess (3-digit)"
-				required
-				class="guess-input"
-				autofocus
-			/>
+	<form on:submit|preventDefault={handleGuess}>
+		<input
+			type="number"
+			bind:value={userGuess}
+			placeholder={isSuccess
+				? `Solved in ${allGuesses.length} guesses!`
+				: 'Enter your guess (3-digit)'}
+			required
+			class="guess-input"
+			autofocus
+			disabled={isSuccess}
+		/>
+		{#if !isSuccess}
 			<button type="submit">Guess</button>
-		</form>
-	{/if}
+		{/if}
+	</form>
 
 	{#if errorMessage}
 		<p class="error-message" transition:fade>{errorMessage}</p>
@@ -209,9 +204,13 @@
 						</span>
 					{/each}
 				</div>
-				<div class="result product">
-					{correctProduct}
-				</div>
+				{#if isSuccess && index === 0}
+					<button on:click={copyResultsToClipboard}>{isCopied ? 'Copied!' : 'Share'}</button>
+				{:else}
+					<div class="result product">
+						{correctProduct}
+					</div>
+				{/if}
 			</div>
 		{/each}
 	</div>
@@ -341,12 +340,6 @@
 	.success h2 {
 		font-size: 1.25rem;
 		margin-bottom: 0.5rem;
-	}
-
-	.copy-btn {
-		background-color: white;
-		color: var(--font-color);
-		margin-top: 1rem;
 	}
 
 	.guesses {
