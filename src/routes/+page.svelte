@@ -174,6 +174,18 @@
 				>{isCopied ? 'Copied!' : 'Share'}</button
 			>
 		</div>
+	{:else}
+		<form on:submit|preventDefault={handleGuess}>
+			<input
+				type="number"
+				bind:value={userGuess}
+				placeholder="Enter your guess (3-digit)"
+				required
+				class="guess-input"
+				autofocus
+			/>
+			<button type="submit">Guess</button>
+		</form>
 	{/if}
 
 	{#if errorMessage}
@@ -206,19 +218,6 @@
 			</div>
 		{/each}
 	</div>
-	{#if !isSuccess}
-		<form on:submit|preventDefault={handleGuess}>
-			<input
-				type="number"
-				bind:value={userGuess}
-				placeholder="Enter your guess (3-digit)"
-				required
-				class="guess-input"
-				autofocus
-			/>
-			<button type="submit">Guess</button>
-		</form>
-	{/if}
 </main>
 
 <style>
@@ -268,9 +267,6 @@
 
 	button:hover {
 		filter: brightness(0.9);
-	}
-
-	.header {
 	}
 
 	.header-wrapper {
@@ -360,9 +356,8 @@
 		width: 100%;
 		max-width: 400px;
 		display: flex;
-		flex-direction: column-reverse;
+		flex-direction: column;
 		gap: 1rem;
-		margin-top: auto;
 		padding-top: 0.25rem;
 		overflow-y: auto;
 		-ms-overflow-style: none;
