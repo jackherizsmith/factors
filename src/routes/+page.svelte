@@ -174,18 +174,6 @@
 				>{isCopied ? 'Copied!' : 'Share'}</button
 			>
 		</div>
-	{:else}
-		<form on:submit|preventDefault={handleGuess}>
-			<input
-				type="number"
-				bind:value={userGuess}
-				placeholder="Enter your guess (3-digit)"
-				required
-				class="guess-input"
-				autofocus
-			/>
-			<button type="submit">Guess</button>
-		</form>
 	{/if}
 
 	{#if errorMessage}
@@ -218,6 +206,19 @@
 			</div>
 		{/each}
 	</div>
+	{#if !isSuccess}
+		<form on:submit|preventDefault={handleGuess}>
+			<input
+				type="number"
+				bind:value={userGuess}
+				placeholder="Enter your guess (3-digit)"
+				required
+				class="guess-input"
+				autofocus
+			/>
+			<button type="submit">Guess</button>
+		</form>
+	{/if}
 </main>
 
 <style>
@@ -241,6 +242,11 @@
 		align-items: center;
 		margin: 0;
 		overflow-x: hidden;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
 	}
 
 	h1,
@@ -265,15 +271,18 @@
 	}
 
 	.header {
-		margin-bottom: 0.5rem;
+		top: 0;
+		left: 0;
+		right: 0;
 	}
 
 	.header-wrapper {
-		display: flex;
 		align-items: start;
+		display: flex;
 		justify-content: space-between;
-		width: 100%;
 		max-width: 400px;
+		padding-bottom: 0.5rem;
+		width: 100%;
 	}
 
 	.header h1 {
@@ -320,7 +329,7 @@
 
 	.guess-input {
 		padding: 0.8rem;
-		margin-bottom: 0.5rem;
+		margin: 1rem 0 0.5rem;
 		border: 1px solid #ccc;
 		border-radius: 4px;
 		font-size: 1rem;
@@ -336,6 +345,7 @@
 		text-align: center;
 		padding: 1rem;
 		border-radius: 8px;
+		margin: 1rem 0;
 	}
 
 	.success h2 {
@@ -353,9 +363,17 @@
 		width: 100%;
 		max-width: 400px;
 		display: flex;
-		flex-direction: column;
+		flex-direction: column-reverse;
 		gap: 1rem;
-		margin-top: 1rem;
+		margin-top: auto;
+		padding-top: 0.25rem;
+		overflow-y: auto;
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+
+	.guesses::-webkit-scrollbar {
+		display: none;
 	}
 
 	.guess-card {
