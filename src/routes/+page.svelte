@@ -21,13 +21,18 @@
 	let errorMessage = '';
 
 	function generateSecretNumber() {
-		const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29];
+		const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
 
 		function hasValidPrimeFactors(num: number) {
+			let factors = [];
 			for (let prime of primes) {
 				while (num % prime === 0) {
 					num /= prime;
+					factors.push(prime);
 				}
+			}
+			if (factors.length < 3) {
+				return false;
 			}
 			return num === 1;
 		}
@@ -140,7 +145,9 @@
 	<div class="header-wrapper">
 		<div class="header">
 			<h1>Prime Factory</h1>
-			<p>{new Date().toLocaleDateString()}</p>
+			<p>
+				{new Date().toLocaleDateString()} - {primeFactors.length} factors
+			</p>
 		</div>
 		<button class="info-btn" on:click={toggleModal}>How?</button>
 	</div>
@@ -148,10 +155,11 @@
 	<dialog open={showModal}>
 		<h2>Rules</h2>
 		<p>
-			Guess today's three digit number, using the correct prime factors of your previous guesses.
+			Guess today's three digit number, using the number of factors and your previous successful
+			guesses.
 		</p>
 		<ul>
-			<li>The biggest prime factor is <b>29</b></li>
+			<li>The prime factors are under <b>50</b></li>
 			<li>
 				Factors will be <b class="correct-text">correct</b> or
 				<b class="incorrect-text">incorrect</b>
