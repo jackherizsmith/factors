@@ -109,7 +109,7 @@
 			.filter((res) => res.isCorrect)
 			.reduce((prod, res) => prod * res.factor, 1);
 
-		results = roundResults;
+		results = roundResults.sort((a, b) => +b.isCorrect - +a.isCorrect);
 		allGuesses = [{ guess: parsedGuess, results: roundResults, correctProduct }, ...allGuesses];
 
 		if (isExactMatch) {
@@ -124,17 +124,9 @@
 	async function copyResultsToClipboard() {
 		const today = new Date();
 		const todayDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
-		const guessesToEmojis = allGuesses.map((g) => {
-			const factors: string[] = g.results
-				.sort((a, b) => +b.isCorrect - +a.isCorrect)
-				.map((r) => (r.isCorrect ? '🟢' : '🔴'));
-			const missedFactorsCount = primeFactors.length - g.results.filter((r) => r.isCorrect).length;
-			const missedFactors: string[] = [];
-			missedFactors.length = missedFactorsCount;
-			missedFactors.fill('⚫️');
-			factors.push(...missedFactors);
-			return factors.join('');
-		});
+		const guessesToEmojis = allGuesses.map((g, i) =>
+			g.results.map((r) => (i == 0 ? '🟠' : r.isCorrect ? '🟢' : '🔴')).join('')
+		);
 		const resultText = [
 			`${todayDate}\n`,
 			...guessesToEmojis.reverse(),
@@ -170,7 +162,6 @@
 				<b class="incorrect-text">incorrect</b>
 			</li>
 			<li>Keep going until you strike <b class="win-text">gold</b></li>
-			<li>A lower score is better 🏆</li>
 		</ul>
 		<button on:click={toggleModal}>Close</button>
 	</dialog>
@@ -191,6 +182,7 @@
 				placeholder="Enter your guess (3-digit)"
 				required
 				class="guess-input"
+				autofocus
 			/>
 			<button type="submit">Guess</button>
 		</form>
@@ -220,13 +212,7 @@
 						</span>
 					{/each}
 				</div>
-				<div
-					class="result {isSuccess && index === 0
-						? 'win'
-						: results.some((r) => r.isCorrect)
-							? 'correct'
-							: 'incorrect'}"
-				>
+				<div class="result product">
 					{correctProduct}
 				</div>
 			</div>
@@ -399,11 +385,17 @@
 	}
 
 	.result {
-		display: inline-block;
-		padding: 0.5rem;
-		border-radius: 4px;
+		display: flex;
+		border-radius: 50%;
 		font-size: 0.9rem;
-		text-align: center;
+		height: 2rem;
+		width: 2rem;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.product {
+		border-radius: 0;
 	}
 
 	.win-text {
