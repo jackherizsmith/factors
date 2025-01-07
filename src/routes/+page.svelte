@@ -151,7 +151,7 @@
 
 	<dialog open={showModal}>
 		<h2>Rules</h2>
-		<p>Guess today's three digit number, using the information you uncover.</p>
+		<p>Guess today's three digit number, using the information you discover.</p>
 		<ul>
 			<li>The prime factors are under <b>50</b></li>
 			<li>
