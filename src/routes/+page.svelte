@@ -124,16 +124,21 @@
 	async function copyResultsToClipboard() {
 		const today = new Date();
 		const todayDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
-		const allGuessesFlat = allGuesses.flatMap((g) => g.results);
-		const incorrectGuesses = allGuessesFlat.filter((g) => !g.isCorrect);
-		const incorrectPct = incorrectGuesses.length / allGuessesFlat.length;
-		const score = allGuesses.length + incorrectGuesses.length - 1;
+		const guessesToEmojis = allGuesses.map((g) => {
+			const factors: string[] = g.results
+				.sort((a, b) => +a.isCorrect - +b.isCorrect)
+				.map((r) => (r.isCorrect ? '🟢' : '🔴'));
+			const missedFactorsCount = primeFactors.length - g.results.filter((r) => r.isCorrect).length;
+			const missedFactors: string[] = [];
+			missedFactors.length = missedFactorsCount;
+			missedFactors.fill('⚫️');
+			factors.push(...missedFactors);
+			return factors.join('');
+		});
 		const resultText = [
-			todayDate,
-			`🔁: ${allGuesses.length}`,
-			`🔴: ${(incorrectPct * 100).toFixed(1)}%`,
-			`👌: ${score}`,
-			'jackherizsmith.github.io/factors'
+			`${todayDate}\n`,
+			...guessesToEmojis.reverse(),
+			'\njackherizsmith.github.io/factors'
 		].join('\n');
 
 		await navigator.clipboard.writeText(resultText);
