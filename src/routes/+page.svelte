@@ -126,7 +126,7 @@
 		const todayDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
 		const guessesToEmojis = allGuesses.map((g) => {
 			const factors: string[] = g.results
-				.sort((a, b) => +a.isCorrect - +b.isCorrect)
+				.sort((a, b) => +b.isCorrect - +a.isCorrect)
 				.map((r) => (r.isCorrect ? '🟢' : '🔴'));
 			const missedFactorsCount = primeFactors.length - g.results.filter((r) => r.isCorrect).length;
 			const missedFactors: string[] = [];
