@@ -158,8 +158,6 @@
 	}
 
 	async function copyResultsToClipboard() {
-		const today = new Date();
-		const todayDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
 		const guessesToEmojis = allGuesses.map((g, i) =>
 			g.results.map((r) => (i == 0 ? '🟠' : r.isCorrect ? '🟢' : '🔴')).join('')
 		);
