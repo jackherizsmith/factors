@@ -10,6 +10,7 @@
 
 	type Result = { factor: number; isCorrect: boolean };
 	type Guess = { guess: number; results: Result[]; correctProduct: number };
+	type StoredGuesses = { allGuesses: Guess[]; todayDate: string };
 
 	let secretNumber: number;
 	let primeFactors: number[] = [];
@@ -19,6 +20,8 @@
 	let isSuccess = false;
 	let isCopied = false;
 	let errorMessage = '';
+	let isReady = false;
+	const todayDate = new Date().toLocaleDateString();
 
 	function generateSecretNumber() {
 		const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
@@ -71,6 +74,15 @@
 	}
 
 	onMount(() => {
+		const localGuesses = localStorage.getItem('guesses');
+		if (localGuesses) {
+			const guesses: StoredGuesses = JSON.parse(localGuesses);
+			if (todayDate === guesses.todayDate) {
+				allGuesses = guesses.allGuesses;
+				isSuccess = true;
+			}
+		}
+		isReady = true;
 		secretNumber = generateSecretNumber();
 		primeFactors = getPrimeFactors(secretNumber);
 
@@ -128,6 +140,8 @@
 
 		if (isExactMatch) {
 			isSuccess = true;
+			const storedGuesses: StoredGuesses = { allGuesses, todayDate };
+			localStorage.setItem('guesses', JSON.stringify(storedGuesses));
 		} else {
 			document.querySelector<HTMLInputElement>('.guess-input')?.focus();
 		}
@@ -157,7 +171,7 @@
 		<header>
 			<h1>PRIMED</h1>
 			<p>
-				{new Date().toLocaleDateString()}
+				{todayDate}
 			</p>
 		</header>
 		<dialog>
@@ -191,11 +205,9 @@
 			required
 			class="guess-input"
 			autofocus
-			disabled={isSuccess}
+			disabled={!isReady || isSuccess}
 		/>
-		{#if !isSuccess}
-			<button type="submit">Guess</button>
-		{/if}
+		<button type="submit" disabled={!isReady || isSuccess}>Guess</button>
 	</form>
 
 	<h2 hidden>Your Guesses</h2>
@@ -288,6 +300,11 @@
 
 	button:hover {
 		filter: brightness(0.9);
+	}
+
+	button:disabled {
+		cursor: default;
+		filter: opacity(0.5);
 	}
 
 	.header-wrapper {
