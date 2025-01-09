@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { parse } from 'svelte/compiler';
 	import { fade, slide, fly } from 'svelte/transition';
 
 	let showModal = false;
@@ -19,9 +20,12 @@
 	let allGuesses: Guess[] = [];
 	let isSuccess = false;
 	let isCopied = false;
-	let errorMessage = '';
+	$: parsedGuess = parseInt(userGuess);
+	$: isTooHigh = parsedGuess > 999;
+	$: isTooLow = parsedGuess < 100;
 	let isReady = false;
 	const todayDate = new Date().toLocaleDateString();
+	let input: HTMLInputElement | null = null;
 
 	function generateSecretNumber() {
 		const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
@@ -91,6 +95,7 @@
 		const dialog = document.querySelector('dialog');
 		const showButton = document.querySelector('dialog + button');
 		const closeButton = document.querySelector('dialog button');
+		input = document.querySelector('input');
 
 		if (dialog && showButton && closeButton) {
 			showButton.addEventListener('click', () => {
@@ -104,12 +109,12 @@
 	});
 
 	function handleGuess() {
-		errorMessage = '';
-		const parsedGuess = parseInt(userGuess);
+		if (isTooHigh) {
+			return;
+		}
 
-		if (isNaN(parsedGuess) || parsedGuess < 100 || parsedGuess > 999) {
-			errorMessage = 'Please enter a valid 3-digit number!';
-			document.querySelector<HTMLInputElement>('input')?.focus();
+		if (isTooLow) {
+			input?.classList.add('error');
 			return;
 		}
 
@@ -172,7 +177,7 @@
 <main>
 	<div class="header-wrapper">
 		<header>
-			<h1>PRIMED</h1>
+			<h1>PRIMER</h1>
 			<p>{todayDate}</p>
 		</header>
 		<dialog>
@@ -192,10 +197,6 @@
 		<button class="info-btn" on:click={toggleModal}>How?</button>
 	</div>
 
-	{#if errorMessage}
-		<p class="error-message" transition:fade>{errorMessage}</p>
-	{/if}
-
 	<form on:submit|preventDefault={handleGuess}>
 		<input
 			type="number"
@@ -203,41 +204,59 @@
 			placeholder={isSuccess ? `Solved in ${allGuesses.length} guesses!` : 'Enter a 3 digit number'}
 			required
 			disabled={!isReady || isSuccess}
+			on:input={() => {
+				if (!isTooLow && !isTooHigh && input?.classList.contains('error')) {
+					input.classList.remove('error');
+				}
+			}}
+			class={isTooHigh ? 'error' : ''}
 		/>
 		<button type="submit" disabled={!isReady || isSuccess}>Guess</button>
 	</form>
 
 	<h2 hidden>Your guesses</h2>
 	<div class="guesses">
-		{#each allGuesses as { guess, results, correctProduct }, index}
-			<div class="guess-card" transition:slide>
-				<p class="guess-header">
-					{guess}
-				</p>
-				<div class="guess-results">
-					{#each results as { factor, isCorrect }}
-						<span
-							class="result {isSuccess && index === 0
-								? 'win'
-								: isCorrect
-									? 'correct'
-									: 'incorrect'}"
+		{#if allGuesses.length > 0}
+			{#each allGuesses as { guess, results, correctProduct }, index}
+				<div class="guess-card" transition:slide>
+					<p class="guess-header">
+						{guess}
+					</p>
+					<div class="guess-results">
+						{#each results as { factor, isCorrect }}
+							<span
+								class="result {isSuccess && index === 0
+									? 'win'
+									: isCorrect
+										? 'correct'
+										: 'incorrect'}"
+							>
+								{factor}
+							</span>
+						{/each}
+					</div>
+					{#if isSuccess && index === 0}
+						<button on:click={copyResultsToClipboard} autofocus
+							>{isCopied ? 'Copied!' : 'Share'}</button
 						>
-							{factor}
-						</span>
+					{:else}
+						<div class="result product">
+							{correctProduct}
+						</div>
+					{/if}
+				</div>
+			{/each}
+		{:else}
+			<div class="guess-card">
+				<p class="guess-header"></p>
+				<div class="guess-results">
+					{#each primeFactors as f}
+						<span class="result pregame">?</span>
 					{/each}
 				</div>
-				{#if isSuccess && index === 0}
-					<button on:click={copyResultsToClipboard} autofocus
-						>{isCopied ? 'Copied!' : 'Share'}</button
-					>
-				{:else}
-					<div class="result product">
-						{correctProduct}
-					</div>
-				{/if}
+				<div class="result product"></div>
 			</div>
-		{/each}
+		{/if}
 	</div>
 </main>
 
@@ -251,12 +270,12 @@
 
 	:root {
 		--bg-color: #f9f9f9;
-		--primary-color: #007bff;
 		--win-text: #d4af37;
 		--win-color: #fdde6c;
 		--success-color: #28a745;
 		--danger-color: #dc3545;
 		--font-color: #333;
+		--font-grey: #666;
 		color: var(--font-color);
 		background-color: var(--bg-color);
 	}
@@ -317,7 +336,7 @@
 
 	header p {
 		font-size: 1rem;
-		color: #555;
+		color: var(--font-grey);
 	}
 
 	dialog {
@@ -374,6 +393,10 @@
 		border: 2px solid var(--font-color);
 	}
 
+	input.error {
+		border: 2px solid var(--danger-color);
+	}
+
 	*:focus {
 		border-color: var(--win-color);
 		outline: none;
@@ -392,12 +415,6 @@
 		color: var(--font-color);
 	}
 
-	.error-message {
-		color: var(--danger-color);
-		margin-top: 0.5rem;
-		font-size: 0.9rem;
-	}
-
 	.guesses {
 		width: 100%;
 		max-width: 400px;
@@ -407,6 +424,7 @@
 		overflow-y: auto;
 		-ms-overflow-style: none;
 		scrollbar-width: none;
+		padding: 2px 0;
 	}
 
 	.guesses::-webkit-scrollbar {
@@ -467,6 +485,11 @@
 
 	.win {
 		background-color: var(--win-color);
+	}
+
+	.pregame {
+		background-color: var(--font-grey);
+		color: white;
 	}
 
 	.correct {
