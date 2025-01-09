@@ -140,28 +140,32 @@
 
 <main>
 	<div class="header-wrapper">
-		<div class="header">
-			<h1>Prime Factory</h1>
+		<header>
+			<h1>PRIMED</h1>
 			<p>
-				{new Date().toLocaleDateString()} - {primeFactors.length} factors
+				{new Date().toLocaleDateString()}
 			</p>
-		</div>
+		</header>
 		<button class="info-btn" on:click={toggleModal}>How?</button>
 	</div>
 
 	<dialog open={showModal}>
-		<h2>Rules</h2>
-		<p>Guess today's three digit number, using the information you discover.</p>
+		<h2>How to play</h2>
+		<p>The solution is a 3-digit number with prime factors {'<'} 50</p>
 		<ul>
-			<li>The prime factors are under <b>50</b></li>
 			<li>
 				Factors will be <b class="correct-text">correct</b> or
 				<b class="incorrect-text">incorrect</b>
 			</li>
 			<li>Keep going until you strike <b class="win-text">gold</b></li>
+			<li>Today's solution has <b>{primeFactors.length}</b> factors</li>
 		</ul>
 		<button on:click={toggleModal}>Close</button>
 	</dialog>
+
+	{#if errorMessage}
+		<p class="error-message" transition:fade>{errorMessage}</p>
+	{/if}
 
 	<form on:submit|preventDefault={handleGuess}>
 		<input
@@ -179,10 +183,6 @@
 			<button type="submit">Guess</button>
 		{/if}
 	</form>
-
-	{#if errorMessage}
-		<p class="error-message" transition:fade>{errorMessage}</p>
-	{/if}
 
 	<h2 hidden>Your Guesses</h2>
 	<div class="guesses">
@@ -217,6 +217,13 @@
 </main>
 
 <style>
+	@font-face {
+		font-family: 'BluuNext Bold';
+		font-style: normal;
+		font-weight: 700;
+		src: url('/fonts/BluuNext-Bold.otf') format('opentype');
+	}
+
 	:root {
 		--bg-color: #f9f9f9;
 		--primary-color: #007bff;
@@ -225,13 +232,12 @@
 		--success-color: #28a745;
 		--danger-color: #dc3545;
 		--font-color: #333;
-		--padding: 1rem;
 		color: var(--font-color);
 		background-color: var(--bg-color);
 	}
 	main {
 		font-family: sans-serif;
-		padding: var(--padding);
+		padding: 1rem;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -244,6 +250,11 @@
 		right: 0;
 	}
 
+	h1 {
+		font-family: 'BluuNext Bold', serif;
+		font-size: 2rem;
+	}
+
 	h1,
 	h2,
 	p {
@@ -252,9 +263,9 @@
 
 	button {
 		padding: 0.5rem 1rem;
-		background-color: var(--primary-color);
-		color: white;
-		border: none;
+		background-color: var(--bg-color);
+		color: var(--font-color);
+		border: 2px solid var(--font-color);
 		border-radius: 4px;
 		cursor: pointer;
 		transition: filter 0.3s;
@@ -269,24 +280,19 @@
 		align-items: start;
 		display: flex;
 		justify-content: space-between;
+		margin-bottom: 0.5rem;
 		max-width: 400px;
-		padding-bottom: 0.5rem;
 		width: 100%;
 	}
 
-	.header h1 {
-		font-size: 1.5rem;
-		margin-bottom: 0.25rem;
-	}
-
-	.header p {
+	header p {
 		font-size: 1rem;
 		color: #555;
 	}
 
 	dialog {
 		background: white;
-		padding: 1rem 0.5rem;
+		padding: 1rem;
 		border-radius: 8px;
 		margin: 0 1.5rem;
 		max-width: 400px;
@@ -306,22 +312,30 @@
 	}
 
 	dialog h2 {
+		font-size: 1.25rem;
 		margin-bottom: 0.5rem;
 	}
 
 	form {
+		align-items: center;
 		width: 100%;
 		max-width: 400px;
+		margin-bottom: 1rem;
 		display: flex;
-		flex-direction: column;
+		gap: 0.5rem;
+		justify-content: space-between;
+	}
+
+	form button {
+		height: 100%;
 	}
 
 	.guess-input {
 		padding: 0.8rem;
-		margin: 1rem 0 0.5rem;
 		border: 1px solid #ccc;
 		border-radius: 4px;
 		font-size: 1rem;
+		flex: 1;
 	}
 
 	.error-message {
@@ -330,25 +344,12 @@
 		font-size: 0.9rem;
 	}
 
-	.success {
-		text-align: center;
-		padding: 1rem;
-		border-radius: 8px;
-		margin: 1rem 0;
-	}
-
-	.success h2 {
-		font-size: 1.25rem;
-		margin-bottom: 0.5rem;
-	}
-
 	.guesses {
 		width: 100%;
 		max-width: 400px;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-		padding-top: 0.25rem;
 		overflow-y: auto;
 		-ms-overflow-style: none;
 		scrollbar-width: none;
@@ -425,22 +426,19 @@
 	}
 
 	@media (min-width: 460px) {
-		main {
-			padding: 2rem;
-		}
-
 		.header-wrapper {
 			display: initial;
 			text-align: center;
+			margin-bottom: 1rem;
 		}
 
-		.header h1 {
-			font-size: 1.25rem;
+		header h1 {
+			font-size: 2.5rem;
 		}
 
 		.info-btn {
-			top: 0.5rem;
-			right: 0.5rem;
+			top: 1rem;
+			right: 1rem;
 			position: fixed;
 		}
 
