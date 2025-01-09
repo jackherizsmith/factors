@@ -73,6 +73,20 @@
 	onMount(() => {
 		secretNumber = generateSecretNumber();
 		primeFactors = getPrimeFactors(secretNumber);
+
+		const dialog = document.querySelector('dialog');
+		const showButton = document.querySelector('dialog + button');
+		const closeButton = document.querySelector('dialog button');
+
+		if (dialog && showButton && closeButton) {
+			showButton.addEventListener('click', () => {
+				dialog.showModal();
+			});
+
+			closeButton.addEventListener('click', () => {
+				dialog.close();
+			});
+		}
 	});
 
 	function handleGuess() {
@@ -146,22 +160,22 @@
 				{new Date().toLocaleDateString()}
 			</p>
 		</header>
+		<dialog>
+			<h2>How to play</h2>
+			<p>The solution is a 3-digit number with prime factors {'<'} 50.</p>
+			<ul>
+				<li>
+					Factors will be <b class="correct-text">correct</b> or
+					<b class="incorrect-text">incorrect</b>
+				</li>
+				<li>Keep going until you strike <b class="win-text">gold</b></li>
+				<li>Today's solution has <b>{primeFactors.length}</b> factors</li>
+			</ul>
+			<p>Devised by Ramsay, built by Jack 🚀</p>
+			<button on:click={toggleModal}>Close</button>
+		</dialog>
 		<button class="info-btn" on:click={toggleModal}>How?</button>
 	</div>
-
-	<dialog open={showModal}>
-		<h2>How to play</h2>
-		<p>The solution is a 3-digit number with prime factors {'<'} 50</p>
-		<ul>
-			<li>
-				Factors will be <b class="correct-text">correct</b> or
-				<b class="incorrect-text">incorrect</b>
-			</li>
-			<li>Keep going until you strike <b class="win-text">gold</b></li>
-			<li>Today's solution has <b>{primeFactors.length}</b> factors</li>
-		</ul>
-		<button on:click={toggleModal}>Close</button>
-	</dialog>
 
 	{#if errorMessage}
 		<p class="error-message" transition:fade>{errorMessage}</p>
@@ -294,12 +308,20 @@
 		background: white;
 		padding: 1rem;
 		border-radius: 8px;
-		margin: 0 1.5rem;
+		top: 1.5rem;
 		max-width: 400px;
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 		text-align: center;
-		position: absolute;
-		z-index: 10;
+	}
+
+	dialog h2 {
+		font-size: 1.25rem;
+		margin-bottom: 1rem;
+	}
+
+	dialog p {
+		margin-bottom: 1rem;
+		text-align: left;
 	}
 
 	dialog ul {
@@ -309,11 +331,6 @@
 
 	dialog li {
 		margin-bottom: 0.25rem;
-	}
-
-	dialog h2 {
-		font-size: 1.25rem;
-		margin-bottom: 0.5rem;
 	}
 
 	form {
