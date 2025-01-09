@@ -184,7 +184,7 @@
 					<b class="incorrect-text">incorrect</b>
 				</li>
 				<li>Keep going until you strike <b class="win-text">gold</b></li>
-				<li>Today's solution has <b>{primeFactors.length}</b> factors</li>
+				<li>Today's solution has <b>{primeFactors.length}</b> prime factors</li>
 			</ul>
 			<p>Devised by Ramsay, built by Jack 🚀</p>
 			<button on:click={toggleModal}>Close</button>
@@ -325,6 +325,7 @@
 		padding: 1rem;
 		border-radius: 8px;
 		top: 1.5rem;
+		margin: 1rem;
 		max-width: 400px;
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 		text-align: center;
