@@ -10,7 +10,7 @@
 
 	type Result = { factor: number; isCorrect: boolean };
 	type Guess = { guess: number; results: Result[]; correctProduct: number };
-	type StoredGuesses = { allGuesses: Guess[]; todayDate: string };
+	type StoredGuesses = { allGuesses: Guess[]; todayDate: string; isSuccess: boolean };
 
 	let secretNumber: number;
 	let primeFactors: number[] = [];
@@ -79,6 +79,8 @@
 			const guesses: StoredGuesses = JSON.parse(localGuesses);
 			if (todayDate === guesses.todayDate) {
 				allGuesses = guesses.allGuesses;
+			}
+			if (guesses.isSuccess) {
 				isSuccess = true;
 			}
 		}
@@ -107,7 +109,7 @@
 
 		if (isNaN(parsedGuess) || parsedGuess < 100 || parsedGuess > 999) {
 			errorMessage = 'Please enter a valid 3-digit number!';
-			document.querySelector<HTMLInputElement>('.guess-input')?.focus();
+			document.querySelector<HTMLInputElement>('input')?.focus();
 			return;
 		}
 
@@ -140,11 +142,12 @@
 
 		if (isExactMatch) {
 			isSuccess = true;
-			const storedGuesses: StoredGuesses = { allGuesses, todayDate };
-			localStorage.setItem('guesses', JSON.stringify(storedGuesses));
 		} else {
-			document.querySelector<HTMLInputElement>('.guess-input')?.focus();
+			document.querySelector<HTMLInputElement>('input')?.focus();
 		}
+
+		const storedGuesses: StoredGuesses = { allGuesses, todayDate, isSuccess };
+		localStorage.setItem('guesses', JSON.stringify(storedGuesses));
 
 		userGuess = '';
 	}
@@ -170,9 +173,7 @@
 	<div class="header-wrapper">
 		<header>
 			<h1>PRIMED</h1>
-			<p>
-				{todayDate}
-			</p>
+			<p>{todayDate}</p>
 		</header>
 		<dialog>
 			<h2>How to play</h2>
@@ -199,18 +200,14 @@
 		<input
 			type="number"
 			bind:value={userGuess}
-			placeholder={isSuccess
-				? `Solved in ${allGuesses.length} guesses!`
-				: 'Enter your guess (3-digit)'}
+			placeholder={isSuccess ? `Solved in ${allGuesses.length} guesses!` : 'Enter a 3 digit number'}
 			required
-			class="guess-input"
-			autofocus
 			disabled={!isReady || isSuccess}
 		/>
 		<button type="submit" disabled={!isReady || isSuccess}>Guess</button>
 	</form>
 
-	<h2 hidden>Your Guesses</h2>
+	<h2 hidden>Your guesses</h2>
 	<div class="guesses">
 		{#each allGuesses as { guess, results, correctProduct }, index}
 			<div class="guess-card" transition:slide>
@@ -231,7 +228,9 @@
 					{/each}
 				</div>
 				{#if isSuccess && index === 0}
-					<button on:click={copyResultsToClipboard}>{isCopied ? 'Copied!' : 'Share'}</button>
+					<button on:click={copyResultsToClipboard} autofocus
+						>{isCopied ? 'Copied!' : 'Share'}</button
+					>
 				{:else}
 					<div class="result product">
 						{correctProduct}
@@ -299,19 +298,19 @@
 	}
 
 	button:hover {
-		filter: brightness(0.9);
+		filter: brightness(0.95);
 	}
 
 	button:disabled {
 		cursor: default;
-		filter: opacity(0.5);
+		filter: opacity(0.7);
 	}
 
 	.header-wrapper {
 		align-items: start;
 		display: flex;
 		justify-content: space-between;
-		margin-bottom: 0.5rem;
+		margin-bottom: 1rem;
 		max-width: 400px;
 		width: 100%;
 	}
@@ -364,12 +363,32 @@
 		height: 100%;
 	}
 
-	.guess-input {
+	input {
 		padding: 0.8rem;
 		border: 1px solid #ccc;
 		border-radius: 4px;
 		font-size: 1rem;
 		flex: 1;
+		color: var(--font-color);
+		border: 2px solid var(--font-color);
+	}
+
+	*:focus {
+		border-color: var(--win-color);
+		outline: none;
+	}
+
+	input:disabled {
+		cursor: default;
+		filter: opacity(0.7);
+	}
+
+	input:focus::placeholder {
+		color: transparent;
+	}
+
+	input:disabled::placeholder {
+		color: var(--font-color);
 	}
 
 	.error-message {
@@ -463,7 +482,7 @@
 		.header-wrapper {
 			display: initial;
 			text-align: center;
-			margin-bottom: 1rem;
+			margin-bottom: 1.5rem;
 		}
 
 		header h1 {
