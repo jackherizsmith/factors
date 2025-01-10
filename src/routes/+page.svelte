@@ -205,7 +205,7 @@
 					Factors will be <b class="correct-text">correct</b> or
 					<b class="incorrect-text">incorrect</b>
 				</li>
-				<li>Keep going until you strike <b class="win-text">gold</b></li>
+				<li>Collect all the <b class="win-text">gold</b></li>
 				<li>Share your game</li>
 			</ul>
 			<p>Devised by Ramsay, built by Jack 🚀</p>
@@ -220,6 +220,9 @@
 				{isSuccess ? correctProduct : '100'}
 			</p>
 			<div class="guess-results">
+				{#each correctGuess as f}
+					<span class={`result win  ${isSuccess ? '' : 'hide-text'}`}>{f}</span>
+				{/each}
 				{#each correctGuess as f}
 					<span class={`result win  ${isSuccess ? '' : 'hide-text'}`}>{f}</span>
 				{/each}
@@ -454,6 +457,11 @@
 		padding: 2px 0;
 	}
 
+	.share > button {
+		height: 2rem;
+		padding: 0.25rem 0.5rem;
+	}
+
 	.guesses::-webkit-scrollbar {
 		display: none;
 	}
@@ -468,10 +476,6 @@
 		justify-content: space-between;
 		padding: 0.8rem;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	}
-
-	.guess-card.share {
-		height: 2rem;
 	}
 
 	.guess-success {
