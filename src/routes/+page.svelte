@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { parse } from 'svelte/compiler';
-	import { fade, slide, fly } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 
 	let showModal = false;
 
@@ -23,6 +22,26 @@
 	$: parsedGuess = parseInt(userGuess);
 	$: isTooHigh = parsedGuess > 999;
 	$: isTooLow = parsedGuess < 100;
+	$: correctFactors = allGuesses.reduce((a: Record<string, number>, b) => {
+		const counts: Record<string, number> = {};
+		b.results.forEach((r) => {
+			if (r.isCorrect) {
+				counts[r.factor] = (counts[r.factor] || 0) + 1;
+			}
+		});
+		const correctGuessFactors = Object.keys(counts);
+		const aCopy = { ...a };
+		correctGuessFactors.forEach((f) => {
+			if (counts[f] > (aCopy[f] || 0)) {
+				aCopy[f] = counts[f];
+			}
+		});
+		return aCopy;
+	}, {});
+	$: correctGuess = Object.entries(correctFactors).flatMap(([key, count]) =>
+		Array(count).fill(Number(key))
+	);
+	$: correctProduct = correctGuess.reduce((a, b) => a * b, 1);
 	let isReady = false;
 	const todayDate = new Date().toLocaleDateString();
 	let input: HTMLInputElement | null = null;
@@ -195,6 +214,26 @@
 		<button class="info-btn" on:click={toggleModal}>How?</button>
 	</div>
 
+	<div class="primes">
+		<div class="guess-card">
+			<p class="guess-header">{correctProduct}</p>
+			<div class="guess-results">
+				{#each correctGuess as f}
+					<span class="result win">{f}</span>
+				{/each}
+				{#each primeFactors.slice(correctGuess.length) as f}
+					<span class="result pregame">?</span>
+				{/each}
+			</div>
+			{#if isSuccess}
+				<button on:click={copyResultsToClipboard} autofocus>{isCopied ? 'Copied!' : 'Share'}</button
+				>
+			{:else}
+				<div class="result product">{correctProduct}</div>
+			{/if}
+		</div>
+	</div>
+
 	<form on:submit|preventDefault={handleGuess}>
 		<input
 			type="number"
@@ -214,47 +253,25 @@
 
 	<h2 hidden>Your guesses</h2>
 	<div class="guesses">
-		{#if allGuesses.length > 0}
-			{#each allGuesses as { guess, results, correctProduct }, index}
+		{#each allGuesses as { guess, results, correctProduct }, index}
+			{#if !isSuccess || index > 0}
 				<div class="guess-card" transition:slide>
 					<p class="guess-header">
 						{guess}
 					</p>
 					<div class="guess-results">
 						{#each results as { factor, isCorrect }}
-							<span
-								class="result {isSuccess && index === 0
-									? 'win'
-									: isCorrect
-										? 'correct'
-										: 'incorrect'}"
-							>
+							<span class="result {isCorrect ? 'correct' : 'incorrect'}">
 								{factor}
 							</span>
 						{/each}
 					</div>
-					{#if isSuccess && index === 0}
-						<button on:click={copyResultsToClipboard} autofocus
-							>{isCopied ? 'Copied!' : 'Share'}</button
-						>
-					{:else}
-						<div class="result product">
-							{correctProduct}
-						</div>
-					{/if}
+					<div class="result product">
+						{correctProduct}
+					</div>
 				</div>
-			{/each}
-		{:else}
-			<div class="guess-card">
-				<p class="guess-header"></p>
-				<div class="guess-results">
-					{#each primeFactors as f}
-						<span class="result pregame">?</span>
-					{/each}
-				</div>
-				<div class="result product"></div>
-			</div>
-		{/if}
+			{/if}
+		{/each}
 	</div>
 </main>
 
@@ -411,6 +428,12 @@
 
 	input:disabled::placeholder {
 		color: var(--font-color);
+	}
+
+	.primes {
+		margin-bottom: 1rem;
+		max-width: 400px;
+		width: 100%;
 	}
 
 	.guesses {
