@@ -199,14 +199,14 @@
 		</header>
 		<dialog>
 			<h2>How to play</h2>
-			<p>Guess a 3 digit number with prime factors less than 50.</p>
+			<p>Guess a 3 digit number whose prime factors are less than 50.</p>
 			<ul>
 				<li>
 					Factors will be <b class="correct-text">correct</b> or
 					<b class="incorrect-text">incorrect</b>
 				</li>
 				<li>Keep going until you strike <b class="win-text">gold</b></li>
-				<li>Today's solution has <b>{primeFactors.length}</b> prime factors</li>
+				<li>Share your game</li>
 			</ul>
 			<p>Devised by Ramsay, built by Jack 🚀</p>
 			<button on:click={toggleModal}>Close</button>
