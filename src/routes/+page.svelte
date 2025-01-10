@@ -223,9 +223,6 @@
 				{#each correctGuess as f}
 					<span class={`result win  ${isSuccess ? '' : 'hide-text'}`}>{f}</span>
 				{/each}
-				{#each correctGuess as f}
-					<span class={`result win  ${isSuccess ? '' : 'hide-text'}`}>{f}</span>
-				{/each}
 				{#each primeFactors.slice(correctGuess.length) as f}
 					<span class="result pregame"></span>
 				{/each}
