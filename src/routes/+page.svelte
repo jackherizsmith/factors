@@ -180,11 +180,9 @@
 		const guessesToEmojis = allGuesses.map((g, i) =>
 			g.results.map((r) => (i == 0 ? '🟠' : r.isCorrect ? '🟢' : '🔴')).join('')
 		);
-		const resultText = [
-			`${todayDate}\n`,
-			...guessesToEmojis.reverse(),
-			'\nhttps://primer-game.com'
-		].join('\n');
+		const resultText = [`${todayDate}\n`, ...guessesToEmojis.reverse(), '\nprimer-game.com'].join(
+			'\n'
+		);
 
 		await navigator.clipboard.writeText(resultText);
 		isCopied = true;
@@ -199,14 +197,14 @@
 		</header>
 		<dialog>
 			<h2>How to play</h2>
-			<p>Guess a 3 digit number whose prime factors are less than 50.</p>
+			<p>Guess today's three-digit number.</p>
 			<ul>
+				<li>Its prime factors are less than <b>50</b></li>
 				<li>
-					Factors will be <b class="correct-text">correct</b> or
-					<b class="incorrect-text">incorrect</b>
+					Guesses will be <b class="correct-text">right</b> and
+					<b class="incorrect-text">wrong</b>
 				</li>
-				<li>Collect all the <b class="win-text">gold</b></li>
-				<li>Share your game</li>
+				<li><b class="win-text">Progress</b> is shown at the top</li>
 			</ul>
 			<p>Devised by Ramsay, built by Jack 🚀</p>
 			<button on:click={toggleModal}>Close</button>
@@ -240,7 +238,9 @@
 		<input
 			type="number"
 			bind:value={userGuess}
-			placeholder={isSuccess ? `Solved in ${allGuesses.length} guesses!` : 'Enter a 3 digit number'}
+			placeholder={isSuccess
+				? `Solved in ${allGuesses.length} guesses!`
+				: 'Guess a three-digit number'}
 			required
 			disabled={!isReady || isSuccess}
 			on:input={() => {
