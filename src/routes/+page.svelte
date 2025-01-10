@@ -183,7 +183,7 @@
 		const resultText = [
 			`${todayDate}\n`,
 			...guessesToEmojis.reverse(),
-			'\njackherizsmith.github.io/factors'
+			'\nhttps://primer-game.com'
 		].join('\n');
 
 		await navigator.clipboard.writeText(resultText);
