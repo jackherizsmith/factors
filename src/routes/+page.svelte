@@ -199,7 +199,7 @@
 		</header>
 		<dialog>
 			<h2>How to play</h2>
-			<p>The solution is a 3-digit number with prime factors {'<'} 50.</p>
+			<p>Guess a 3 digit number with prime factors less than 50.</p>
 			<ul>
 				<li>
 					Factors will be <b class="correct-text">correct</b> or
@@ -215,21 +215,23 @@
 	</div>
 
 	<div class="primes">
-		<div class="guess-card">
-			<p class="guess-header">{correctProduct}</p>
+		<div class="guess-card share">
+			<p class={`guess-header ${isSuccess ? 'guess-success' : 'hide-text'}`}>
+				{isSuccess ? correctProduct : '100'}
+			</p>
 			<div class="guess-results">
 				{#each correctGuess as f}
-					<span class="result win">{f}</span>
+					<span class={`result win  ${isSuccess ? '' : 'hide-text'}`}>{f}</span>
 				{/each}
 				{#each primeFactors.slice(correctGuess.length) as f}
-					<span class="result pregame">?</span>
+					<span class="result pregame"></span>
 				{/each}
 			</div>
 			{#if isSuccess}
 				<button on:click={copyResultsToClipboard} autofocus>{isCopied ? 'Copied!' : 'Share'}</button
 				>
 			{:else}
-				<div class="result product">{correctProduct}</div>
+				<div class="result product"></div>
 			{/if}
 		</div>
 	</div>
@@ -337,7 +339,7 @@
 
 	button:disabled {
 		cursor: default;
-		filter: opacity(0.7);
+		filter: opacity(0.6);
 	}
 
 	.header-wrapper {
@@ -419,7 +421,7 @@
 
 	input:disabled {
 		cursor: default;
-		filter: opacity(0.7);
+		filter: opacity(0.6);
 	}
 
 	input:focus::placeholder {
@@ -434,6 +436,10 @@
 		margin-bottom: 1rem;
 		max-width: 400px;
 		width: 100%;
+	}
+
+	.hide-text {
+		color: transparent;
 	}
 
 	.guesses {
@@ -462,6 +468,14 @@
 		justify-content: space-between;
 		padding: 0.8rem;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
+
+	.guess-card.share {
+		height: 2rem;
+	}
+
+	.guess-success {
+		font-weight: 700;
 	}
 
 	.guess-header {
