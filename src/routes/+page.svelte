@@ -200,11 +200,11 @@
 			<p>Guess today's three-digit number.</p>
 			<ul>
 				<li>Its prime factors are less than <b>50</b></li>
+				<li><b class="win-text">Progress</b> is shown at the top</li>
 				<li>
-					Guesses will be <b class="correct-text">right</b> and
+					Guessed factors will be <b class="correct-text">right</b> or
 					<b class="incorrect-text">wrong</b>
 				</li>
-				<li><b class="win-text">Progress</b> is shown at the top</li>
 			</ul>
 			<p>Devised by Ramsay, built by Jack 🚀</p>
 			<button on:click={toggleModal}>Close</button>
