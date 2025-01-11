@@ -102,9 +102,9 @@
 			const guesses: StoredGuesses = JSON.parse(localGuesses);
 			if (todayDate === guesses.todayDate) {
 				allGuesses = guesses.allGuesses;
-			}
-			if (guesses.isSuccess) {
-				isSuccess = true;
+				if (guesses.isSuccess) {
+					isSuccess = true;
+				}
 			}
 		}
 		isReady = true;
@@ -202,7 +202,7 @@
 				<li>Its prime factors are less than <b>50</b></li>
 				<li><b class="win-text">Progress</b> is shown at the top</li>
 				<li>
-					Guessed factors will be <b class="correct-text">right</b> or
+					Guessed factors are <b class="correct-text">right</b> or
 					<b class="incorrect-text">wrong</b>
 				</li>
 			</ul>
@@ -238,9 +238,11 @@
 		<input
 			type="number"
 			bind:value={userGuess}
-			placeholder={isSuccess
-				? `Solved in ${allGuesses.length} guesses!`
-				: 'Guess a three-digit number'}
+			placeholder={!isReady
+				? ''
+				: isSuccess
+					? `Solved in ${allGuesses.length} guesses!`
+					: 'Guess a three-digit number'}
 			required
 			disabled={!isReady || isSuccess}
 			on:input={() => {
