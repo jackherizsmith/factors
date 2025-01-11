@@ -287,6 +287,20 @@
 		src: url('/fonts/BluuNext-Bold.otf') format('opentype');
 	}
 
+	@font-face {
+		font-family: 'InterDisplay';
+		font-style: normal;
+		font-weight: 400;
+		src: url('/fonts/InterDisplay-Regular.woff2') format('woff2');
+	}
+
+	@font-face {
+		font-family: 'InterDisplay';
+		font-style: normal;
+		font-weight: 500;
+		src: url('/fonts/InterDisplay-SemiBold.woff2') format('woff2');
+	}
+
 	:root {
 		--bg-color: #f9f9f9;
 		--win-text: #d4af37;
@@ -299,7 +313,6 @@
 		background-color: var(--bg-color);
 	}
 	main {
-		font-family: sans-serif;
 		padding: 1rem;
 		display: flex;
 		flex-direction: column;
@@ -313,8 +326,14 @@
 		right: 0;
 	}
 
+	* {
+		font-family: 'InterDisplay', sans-serif;
+		font-weight: 400;
+	}
+
 	h1 {
 		font-family: 'BluuNext Bold', serif;
+		font-weight: 700;
 		font-size: 2rem;
 	}
 
@@ -363,13 +382,14 @@
 		padding: 1rem;
 		border-radius: 8px;
 		top: 1.5rem;
-		margin: 1rem;
+		margin: 0 auto;
 		max-width: 400px;
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 		text-align: center;
 	}
 
 	dialog h2 {
+		font-weight: 500;
 		font-size: 1.25rem;
 		margin-bottom: 1rem;
 	}
@@ -478,7 +498,7 @@
 	}
 
 	.guess-success {
-		font-weight: 700;
+		font-weight: 500;
 	}
 
 	.guess-header {
@@ -555,10 +575,6 @@
 			top: 1rem;
 			right: 1rem;
 			position: fixed;
-		}
-
-		dialog {
-			margin: 0 auto;
 		}
 
 		dialog ul {
