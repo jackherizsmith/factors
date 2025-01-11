@@ -208,6 +208,21 @@
 			</ul>
 			<p>Devised by Ramsay, built by Jack 🚀</p>
 			<button on:click={toggleModal}>Close</button>
+			<div class="coffee-button">
+				<script
+					type="text/javascript"
+					src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+					data-name="bmc-button"
+					data-slug="primergame"
+					data-color="#fdde6c"
+					data-emoji=""
+					data-font="Inter"
+					data-text="Buy us a coffee"
+					data-outline-color="#000000"
+					data-font-color="#000000"
+					data-coffee-color="#ffffff"
+				></script>
+			</div>
 		</dialog>
 		<button class="info-btn" on:click={toggleModal}>How?</button>
 	</div>
@@ -379,7 +394,7 @@
 
 	dialog {
 		background: white;
-		padding: 1rem;
+		padding: 1rem 1rem 0.25rem;
 		border-radius: 8px;
 		top: 1.5rem;
 		margin: 0 auto;
@@ -408,6 +423,14 @@
 		margin-bottom: 0.25rem;
 	}
 
+	dialog button {
+		margin-bottom: 0.25rem;
+	}
+
+	.coffee-button {
+		transform: scale(0.5);
+	}
+
 	form {
 		align-items: center;
 		width: 100%;
@@ -416,10 +439,6 @@
 		display: flex;
 		gap: 0.5rem;
 		justify-content: space-between;
-	}
-
-	form button {
-		height: 100%;
 	}
 
 	input {
@@ -578,7 +597,7 @@
 		}
 
 		dialog ul {
-			padding-left: 5rem;
+			padding-left: 2rem;
 		}
 	}
 </style>
